@@ -5,8 +5,16 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify index.js -g es2040 -t glslify | uglifyjs -cm| indexhtmlify | metadataify > index.html",
-    "start": "budo --open --live --force-default-index --host localhost main.js -- -g es2040 -t glslify"
+    "clean": "rm -rf dist/ && mkdir dist/",
+    "build": "npm run clean && npm run build:html && npm run build:js",
+    "js:1": "./node_modules/.bin/browserify ./src/js/main.js -o ./dist/main.js",
+    "js:2": "./node_modules/.bin/browserify ./src/js/page2.js -o ./dist/page2.js",
+    "build:js": "npm run js:1 && npm run js:2",
+    "build:html": "cp ./src/pages/* dist/",
+    "start": "budo ./src/js/main.js --open --live --force-default-index --host --dir ./dist/ --watch-glob './src/**/*.{html,js}' -- -t [glslify]",
+    "//": "bundle splitting main and page2 for our 2 different pages",
+    "// build:js //common.js": "./node_modules/.bin/browserify ./src/js/main.js ./src/js/page2.js -p [ factor-bundle -o dist/main.js -o dist/page2.js ] -o dist/index.js",
+    "// js": "browserify ./src/js/main.js -g es2040 -t glslify | uglifyjs -cm| indexhtmlify | metadataify > dist/index.html"
   },
   "repository": {
     "type": "git",
@@ -22,6 +30,7 @@
     "browserify": "^14.1.0",
     "budo": "^9.4.7",
     "control-panel": "^1.2.0",
+    "d3": "4.10.0",
     "eases": "^1.0.8",
     "es2040": "^1.2.5",
     "fail-nicely": "^2.0.0",
@@ -36,5 +45,9 @@
     "regl": "^1.3.0",
     "standard": "^9.0.1",
     "uglify-js": "^2.8.13"
+  },
+  "devDependencies": {
+    "browserify": "14.4.0",
+    "factor-bundle": "2.5.0"
   }
 }
